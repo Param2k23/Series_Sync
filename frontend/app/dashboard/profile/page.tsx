@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -22,6 +23,14 @@ import {
   Save,
   ArrowLeft,
 } from 'lucide-react';
+import { 
+  getCurrentUser, 
+  updateUser, 
+  logout, 
+  scrapeUserSocialMedia,
+  getConnectionsForUser,
+  User as UserType,
+} from '@/lib/database';
 
 const RedditIcon = () => (
   <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor">
@@ -35,22 +44,54 @@ const navItems = [
 ];
 
 export default function ProfilePage() {
+  const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [currentUser, setCurrentUser] = useState<UserType | null>(null);
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [connectionCount, setConnectionCount] = useState(0);
   const [formData, setFormData] = useState({
-    name: 'John Doe',
-    username: 'johndoe',
-    dob: '1995-06-15',
-    phone: '+1 (555) 123-4567',
-    location: 'San Francisco, CA',
-    occupation: 'Software Engineer',
-    bio: 'Passionate about building great products and connecting with amazing people.',
-    linkedin: 'johndoe',
-    instagram: '@johndoe',
-    twitter: '@johndoe',
-    reddit: 'u/johndoe',
+    name: '',
+    username: '',
+    dob: '',
+    phone: '',
+    location: '',
+    occupation: '',
+    bio: '',
+    linkedin: '',
+    instagram: '',
+    twitter: '',
+    reddit: '',
   });
+
+  // Load user data
+  useEffect(() => {
+    const user = getCurrentUser();
+    if (!user) {
+      router.push('/signup');
+      return;
+    }
+    
+    setCurrentUser(user);
+    setProfileImage(user.profileImage || null);
+    setFormData({
+      name: user.name || '',
+      username: user.username || '',
+      dob: user.dob || '',
+      phone: user.phone || '',
+      location: user.location || '',
+      occupation: user.occupation || '',
+      bio: user.bio || '',
+      linkedin: user.socialProfiles?.linkedin || '',
+      instagram: user.socialProfiles?.instagram || '',
+      twitter: user.socialProfiles?.twitter || '',
+      reddit: user.socialProfiles?.reddit || '',
+    });
+    
+    // Get connection count
+    const connections = getConnectionsForUser(user.id);
+    setConnectionCount(connections.length);
+  }, [router]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -65,10 +106,61 @@ export default function ProfilePage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!currentUser) return;
+    
     setIsSaving(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setIsSaving(false);
+    
+    try {
+      // Update user in database
+      const updatedUser = updateUser(currentUser.id, {
+        name: formData.name,
+        username: formData.username,
+        dob: formData.dob,
+        phone: formData.phone,
+        location: formData.location,
+        occupation: formData.occupation,
+        bio: formData.bio,
+        profileImage: profileImage || undefined,
+        socialProfiles: {
+          linkedin: formData.linkedin || undefined,
+          twitter: formData.twitter || undefined,
+          instagram: formData.instagram || undefined,
+          reddit: formData.reddit || undefined,
+        },
+      });
+      
+      if (updatedUser) {
+        // Re-scrape social media if profiles changed
+        if (formData.linkedin || formData.twitter || formData.instagram || formData.reddit) {
+          scrapeUserSocialMedia(updatedUser.id, {
+            linkedin: formData.linkedin,
+            twitter: formData.twitter,
+            instagram: formData.instagram,
+            reddit: formData.reddit,
+          });
+        }
+        
+        setCurrentUser(updatedUser);
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, 500));
+    } finally {
+      setIsSaving(false);
+    }
   };
+
+  const handleLogout = () => {
+    logout();
+    router.push('/');
+  };
+
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center">
+        <div className="text-slate-500">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
@@ -97,13 +189,13 @@ export default function ProfilePage() {
           ))}
         </nav>
 
-        <Link
-          href="/"
+        <button
+          onClick={handleLogout}
           className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all"
           title="Log out"
         >
           <LogOut className="w-5 h-5" />
-        </Link>
+        </button>
       </aside>
 
       {/* Main content */}
@@ -154,11 +246,34 @@ export default function ProfilePage() {
                     </button>
                   )}
                 </div>
-                <div>
-                  <h1 className="text-xl font-bold text-slate-900">{formData.name}</h1>
-                  <p className="text-slate-500">@{formData.username}</p>
+                <div className="flex-1">
+                  <h1 className="text-xl font-bold text-slate-900">{formData.name || 'Your Name'}</h1>
+                  <p className="text-slate-500">@{formData.username || 'username'}</p>
+                  <p className="text-slate-400 text-sm mt-1">{connectionCount} connections</p>
                 </div>
               </div>
+              
+              {/* Scraped attributes preview */}
+              {currentUser.scrapedAttributes && currentUser.scrapedAttributes.interests.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-slate-100">
+                  <p className="text-xs text-slate-500 mb-2">Your interests (from social profiles)</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {currentUser.scrapedAttributes.interests.slice(0, 6).map((interest, i) => (
+                      <span 
+                        key={i}
+                        className="px-2 py-1 bg-slate-100 text-slate-600 text-xs rounded-md"
+                      >
+                        {interest}
+                      </span>
+                    ))}
+                    {currentUser.scrapedAttributes.interests.length > 6 && (
+                      <span className="px-2 py-1 text-slate-400 text-xs">
+                        +{currentUser.scrapedAttributes.interests.length - 6} more
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Basic info */}
@@ -201,8 +316,10 @@ export default function ProfilePage() {
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       className="pl-10 h-10 bg-slate-50/50 border-slate-200 rounded-xl focus:bg-white"
+                      disabled
                     />
                   </div>
+                  <p className="text-xs text-slate-400">Phone cannot be changed</p>
                 </div>
 
                 <div className="space-y-1.5">
@@ -262,7 +379,8 @@ export default function ProfilePage() {
 
             {/* Social profiles */}
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200/60 p-6 shadow-sm">
-              <h2 className="font-semibold text-slate-900 mb-5">Social Profiles</h2>
+              <h2 className="font-semibold text-slate-900 mb-1">Social Profiles</h2>
+              <p className="text-xs text-slate-500 mb-5">We analyze your social profiles to find better matches</p>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">

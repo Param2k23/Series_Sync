@@ -168,287 +168,171 @@ function IPhoneWithMessages({ scrollProgress }: { scrollProgress: number }) {
             willChange: 'transform, opacity',
           }}
         >
-          {/* iPhone Frame - Clean Design */}
+          {/* Shadow wrapper for cross-browser consistency */}
           <div
-            className="relative rounded-[55px] p-[12px]"
             style={{
-              width: '280px',
-              height: '570px',
-              background:
-                'linear-gradient(145deg, #1f1f1f 0%, #1a1a1a 50%, #111111 100%)',
-              boxShadow: `
-                0 60px 120px -20px rgba(0, 0, 0, 0.5),
-                0 30px 60px -10px rgba(0, 0, 0, 0.4),
-                0 0 0 1px rgba(255,255,255,0.08),
-                inset 0 1px 0 rgba(255,255,255,0.1),
-                inset 0 -1px 0 rgba(0,0,0,0.3)
-              `,
+              position: 'relative',
+              filter:
+                'drop-shadow(0 60px 120px rgba(0, 0, 0, 0.5)) drop-shadow(0 30px 60px rgba(0, 0, 0, 0.4))',
+              WebkitFilter:
+                'drop-shadow(0 60px 120px rgba(0, 0, 0, 0.5)) drop-shadow(0 30px 60px rgba(0, 0, 0, 0.4))',
             }}
           >
-            {/* Side button - Right */}
+            {/* iPhone Frame - Clean Design */}
             <div
-              className="absolute -right-[3px] top-[140px] w-[4px] h-[80px] rounded-r-[2px]"
+              className="relative rounded-[55px] p-[12px]"
               style={{
+                width: '280px',
+                height: '570px',
                 background:
-                  'linear-gradient(90deg, #2a2a2a 0%, #404040 50%, #2a2a2a 100%)',
-              }}
-            />
-            {/* Side buttons - Left */}
-            <div
-              className="absolute -left-[3px] top-[120px] w-[4px] h-[35px] rounded-l-[2px]"
-              style={{
-                background:
-                  'linear-gradient(90deg, #2a2a2a 0%, #404040 50%, #2a2a2a 100%)',
-              }}
-            />
-            <div
-              className="absolute -left-[3px] top-[170px] w-[4px] h-[60px] rounded-l-[2px]"
-              style={{
-                background:
-                  'linear-gradient(90deg, #2a2a2a 0%, #404040 50%, #2a2a2a 100%)',
-              }}
-            />
-            <div
-              className="absolute -left-[3px] top-[245px] w-[4px] h-[60px] rounded-l-[2px]"
-              style={{
-                background:
-                  'linear-gradient(90deg, #2a2a2a 0%, #404040 50%, #2a2a2a 100%)',
-              }}
-            />
-            {/* Screen */}
-            <div
-              className="relative w-full h-full rounded-[45px] overflow-hidden flex flex-col"
-              style={{
-                background: '#ffffff',
-                boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.05)',
+                  'linear-gradient(145deg, #1f1f1f 0%, #1a1a1a 50%, #111111 100%)',
+                // Border and inset shadows only (main shadow via filter)
+                boxShadow: `
+                  0 0 0 1px rgba(255, 255, 255, 0.08),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                  inset 0 -1px 0 rgba(0, 0, 0, 0.3)
+                `,
               }}
             >
-              {/* Dynamic Island */}
+              {/* Side button - Right */}
               <div
-                className="absolute top-[10px] left-1/2 -translate-x-1/2 w-[80px] h-[22px] bg-black rounded-full z-20"
-                style={{ boxShadow: '0 2px 6px rgba(0,0,0,0.2)' }}
+                className="absolute -right-[3px] top-[140px] w-[4px] h-[80px] rounded-r-[2px]"
+                style={{
+                  background:
+                    'linear-gradient(90deg, #2a2a2a 0%, #404040 50%, #2a2a2a 100%)',
+                }}
               />
+              {/* Side buttons - Left */}
+              <div
+                className="absolute -left-[3px] top-[120px] w-[4px] h-[35px] rounded-l-[2px]"
+                style={{
+                  background:
+                    'linear-gradient(90deg, #2a2a2a 0%, #404040 50%, #2a2a2a 100%)',
+                }}
+              />
+              <div
+                className="absolute -left-[3px] top-[170px] w-[4px] h-[60px] rounded-l-[2px]"
+                style={{
+                  background:
+                    'linear-gradient(90deg, #2a2a2a 0%, #404040 50%, #2a2a2a 100%)',
+                }}
+              />
+              <div
+                className="absolute -left-[3px] top-[245px] w-[4px] h-[60px] rounded-l-[2px]"
+                style={{
+                  background:
+                    'linear-gradient(90deg, #2a2a2a 0%, #404040 50%, #2a2a2a 100%)',
+                }}
+              />
+              {/* Screen */}
+              <div
+                className="relative w-full h-full rounded-[45px] overflow-hidden flex flex-col"
+                style={{
+                  background: '#ffffff',
+                  boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.05)',
+                }}
+              >
+                {/* Dynamic Island */}
+                <div
+                  className="absolute top-[10px] left-1/2 -translate-x-1/2 w-[80px] h-[22px] bg-black rounded-full z-20"
+                  style={{ boxShadow: '0 2px 6px rgba(0,0,0,0.2)' }}
+                />
 
-              {/* iOS Status Bar */}
-              <div className="pt-[12px] px-6 flex justify-between items-center">
-                <span className="text-[14px] font-semibold text-black">
-                  9:41
-                </span>
-                <div className="flex items-center gap-1">
-                  <svg width="14" height="9" viewBox="0 0 18 12" fill="none">
-                    <rect
-                      x="0"
-                      y="8"
-                      width="3"
-                      height="4"
-                      rx="0.5"
-                      fill="black"
-                    />
-                    <rect
-                      x="4.5"
-                      y="5.5"
-                      width="3"
-                      height="6.5"
-                      rx="0.5"
-                      fill="black"
-                    />
-                    <rect
-                      x="9"
-                      y="3"
-                      width="3"
-                      height="9"
-                      rx="0.5"
-                      fill="black"
-                    />
-                    <rect
-                      x="13.5"
-                      y="0"
-                      width="3"
-                      height="12"
-                      rx="0.5"
-                      fill="black"
-                    />
-                  </svg>
-                  <svg width="13" height="9" viewBox="0 0 16 12" fill="none">
-                    <path
-                      d="M8 2.4C10.4 2.4 12.5 3.3 14.1 4.8L15.5 3.4C13.5 1.5 10.9 0.3 8 0.3C5.1 0.3 2.5 1.5 0.5 3.4L1.9 4.8C3.5 3.3 5.6 2.4 8 2.4Z"
-                      fill="black"
-                    />
-                    <path
-                      d="M8 6C9.5 6 10.9 6.6 11.9 7.6L13.3 6.2C11.9 4.8 10 4 8 4C6 4 4.1 4.8 2.7 6.2L4.1 7.6C5.1 6.6 6.5 6 8 6Z"
-                      fill="black"
-                    />
-                    <path
-                      d="M8 9.6C8.7 9.6 9.3 9.8 9.8 10.3L8 12L6.2 10.3C6.7 9.8 7.3 9.6 8 9.6Z"
-                      fill="black"
-                    />
-                  </svg>
-                  <div className="flex items-center">
-                    <div className="relative w-[18px] h-[8px] rounded-[2px] border-[1.5px] border-black">
-                      <div className="absolute inset-[1px] right-[2px] bg-black rounded-[1px]" />
-                    </div>
-                    <div className="w-[1px] h-[3px] bg-black rounded-r-[0.5px] ml-[0.5px]" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Chat header */}
-              <div className="px-3 py-2 flex items-center border-b border-gray-100">
-                <button className="text-[#007AFF] p-1">
-                  <svg width="10" height="16" viewBox="0 0 12 20" fill="none">
-                    <path
-                      d="M10 2L2 10L10 18"
-                      stroke="#007AFF"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </button>
-                <div className="flex-1 flex flex-col items-center">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
-                    SS
-                  </div>
-                  <p className="font-semibold text-[14px] text-black mt-0.5">
-                    Series Sync
-                  </p>
-                </div>
-                <button className="text-[#007AFF] p-1">
-                  <svg width="18" height="18" viewBox="0 0 22 22" fill="none">
-                    <circle
-                      cx="11"
-                      cy="7"
-                      r="4"
-                      stroke="#007AFF"
-                      strokeWidth="2"
-                    />
-                    <path
-                      d="M3 20C3 15.5817 6.58172 12 11 12C15.4183 12 19 15.5817 19 20"
-                      stroke="#007AFF"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </button>
-              </div>
-
-              {/* Messages area */}
-              <div className="flex-1 px-3 py-2 overflow-hidden bg-white">
-                <div className="text-center mb-2">
-                  <span className="text-[10px] text-gray-400">
-                    Today 9:41 AM
+                {/* iOS Status Bar */}
+                <div className="pt-[12px] px-6 flex justify-between items-center">
+                  <span className="text-[14px] font-semibold text-black">
+                    9:41
                   </span>
+                  <div className="flex items-center gap-1">
+                    <svg width="14" height="9" viewBox="0 0 18 12" fill="none">
+                      <rect
+                        x="0"
+                        y="8"
+                        width="3"
+                        height="4"
+                        rx="0.5"
+                        fill="black"
+                      />
+                      <rect
+                        x="4.5"
+                        y="5.5"
+                        width="3"
+                        height="6.5"
+                        rx="0.5"
+                        fill="black"
+                      />
+                      <rect
+                        x="9"
+                        y="3"
+                        width="3"
+                        height="9"
+                        rx="0.5"
+                        fill="black"
+                      />
+                      <rect
+                        x="13.5"
+                        y="0"
+                        width="3"
+                        height="12"
+                        rx="0.5"
+                        fill="black"
+                      />
+                    </svg>
+                    <svg width="13" height="9" viewBox="0 0 16 12" fill="none">
+                      <path
+                        d="M8 2.4C10.4 2.4 12.5 3.3 14.1 4.8L15.5 3.4C13.5 1.5 10.9 0.3 8 0.3C5.1 0.3 2.5 1.5 0.5 3.4L1.9 4.8C3.5 3.3 5.6 2.4 8 2.4Z"
+                        fill="black"
+                      />
+                      <path
+                        d="M8 6C9.5 6 10.9 6.6 11.9 7.6L13.3 6.2C11.9 4.8 10 4 8 4C6 4 4.1 4.8 2.7 6.2L4.1 7.6C5.1 6.6 6.5 6 8 6Z"
+                        fill="black"
+                      />
+                      <path
+                        d="M8 9.6C8.7 9.6 9.3 9.8 9.8 10.3L8 12L6.2 10.3C6.7 9.8 7.3 9.6 8 9.6Z"
+                        fill="black"
+                      />
+                    </svg>
+                    <div className="flex items-center">
+                      <div className="relative w-[18px] h-[8px] rounded-[2px] border-[1.5px] border-black">
+                        <div className="absolute inset-[1px] right-[2px] bg-black rounded-[1px]" />
+                      </div>
+                      <div className="w-[1px] h-[3px] bg-black rounded-r-[0.5px] ml-[0.5px]" />
+                    </div>
+                  </div>
                 </div>
 
-                <AnimatePresence mode="wait">
-                  {showMessages && (
-                    <div key={currentCycle} className="flex flex-col gap-1">
-                      {messages.map((message, index) => (
-                        <motion.div
-                          key={index}
-                          initial={{ opacity: 0, y: 15 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0 }}
-                          transition={{
-                            delay: message.delay,
-                            duration: 0.3,
-                            ease: 'easeOut',
-                          }}
-                        >
-                          {message.type !== 'profile' && (
-                            <div
-                              className={`flex ${
-                                message.isUser ? 'justify-end' : 'justify-start'
-                              }`}
-                              style={{
-                                marginBottom: '8px',
-                                paddingRight: message.isUser ? '4px' : '0',
-                                paddingLeft: !message.isUser ? '4px' : '0',
-                              }}
-                            >
-                              <div className="max-w-[80%]">
-                                <div
-                                  className={
-                                    message.isUser
-                                      ? 'imessage-sent has-tail'
-                                      : 'imessage-received has-tail'
-                                  }
-                                >
-                                  {message.text}
-                                </div>
-                              </div>
-                            </div>
-                          )}
-
-                          {message.type === 'profile' && (
-                            <div
-                              className="flex justify-start"
-                              style={{ paddingLeft: '4px', marginTop: '4px' }}
-                            >
-                              <div className="rounded-xl overflow-hidden bg-white border border-gray-200 shadow-sm">
-                                <div className="p-2 flex items-center gap-2">
-                                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-orange-400 to-pink-500 flex items-center justify-center text-lg">
-                                    🏐
-                                  </div>
-                                  <div>
-                                    <p className="font-semibold text-[12px] text-gray-900">
-                                      Volleyball Squad
-                                    </p>
-                                    <p className="text-[10px] text-gray-500">
-                                      12 members
-                                    </p>
-                                  </div>
-                                  <div className="ml-1 px-3 py-1 bg-blue-500 rounded-full">
-                                    <span className="text-white text-[10px] font-semibold">
-                                      Join
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                        </motion.div>
-                      ))}
-                    </div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              {/* iMessage input bar */}
-              <div className="px-2 pt-1 pb-5 bg-[#F2F2F7]">
-                <div className="flex items-center gap-1.5">
-                  <button className="w-7 h-7 flex items-center justify-center">
-                    <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
-                      <circle cx="14" cy="14" r="12" fill="#007AFF" />
+                {/* Chat header */}
+                <div className="px-3 py-2 flex items-center border-b border-gray-100">
+                  <button className="text-[#007AFF] p-1">
+                    <svg width="10" height="16" viewBox="0 0 12 20" fill="none">
                       <path
-                        d="M14 8V20M8 14H20"
-                        stroke="white"
+                        d="M10 2L2 10L10 18"
+                        stroke="#007AFF"
                         strokeWidth="2.5"
                         strokeLinecap="round"
+                        strokeLinejoin="round"
                       />
                     </svg>
                   </button>
-                  <div className="flex-1 h-[32px] bg-white rounded-full border border-gray-300 px-4 flex items-center">
-                    <span className="text-[14px] text-gray-400">iMessage</span>
+                  <div className="flex-1 flex flex-col items-center">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+                      SS
+                    </div>
+                    <p className="font-semibold text-[14px] text-black mt-0.5">
+                      Series Sync
+                    </p>
                   </div>
-                  <button className="w-7 h-7 flex items-center justify-center">
-                    <svg width="16" height="22" viewBox="0 0 20 26" fill="none">
-                      <rect
-                        x="5"
-                        y="0"
-                        width="10"
-                        height="16"
-                        rx="5"
-                        fill="#007AFF"
-                      />
-                      <path
-                        d="M1 12C1 17 5 21 10 21C15 21 19 17 19 12"
+                  <button className="text-[#007AFF] p-1">
+                    <svg width="18" height="18" viewBox="0 0 22 22" fill="none">
+                      <circle
+                        cx="11"
+                        cy="7"
+                        r="4"
                         stroke="#007AFF"
                         strokeWidth="2"
-                        strokeLinecap="round"
                       />
                       <path
-                        d="M10 21V25M7 25H13"
+                        d="M3 20C3 15.5817 6.58172 12 11 12C15.4183 12 19 15.5817 19 20"
                         stroke="#007AFF"
                         strokeWidth="2"
                         strokeLinecap="round"
@@ -456,11 +340,151 @@ function IPhoneWithMessages({ scrollProgress }: { scrollProgress: number }) {
                     </svg>
                   </button>
                 </div>
-              </div>
 
-              {/* Home indicator */}
-              <div className="absolute bottom-2 left-1/2 -translate-x-1/2">
-                <div className="w-[100px] h-[5px] bg-black rounded-full" />
+                {/* Messages area */}
+                <div className="flex-1 px-3 py-2 overflow-hidden bg-white">
+                  <div className="text-center mb-2">
+                    <span className="text-[10px] text-gray-400">
+                      Today 9:41 AM
+                    </span>
+                  </div>
+
+                  <AnimatePresence mode="wait">
+                    {showMessages && (
+                      <div key={currentCycle} className="flex flex-col gap-1">
+                        {messages.map((message, index) => (
+                          <motion.div
+                            key={index}
+                            initial={{ opacity: 0, y: 15 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0 }}
+                            transition={{
+                              delay: message.delay,
+                              duration: 0.3,
+                              ease: 'easeOut',
+                            }}
+                          >
+                            {message.type !== 'profile' && (
+                              <div
+                                className={`flex ${
+                                  message.isUser
+                                    ? 'justify-end'
+                                    : 'justify-start'
+                                }`}
+                                style={{
+                                  marginBottom: '8px',
+                                  paddingRight: message.isUser ? '4px' : '0',
+                                  paddingLeft: !message.isUser ? '4px' : '0',
+                                }}
+                              >
+                                <div className="max-w-[80%]">
+                                  <div
+                                    className={
+                                      message.isUser
+                                        ? 'imessage-sent has-tail'
+                                        : 'imessage-received has-tail'
+                                    }
+                                  >
+                                    {message.text}
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {message.type === 'profile' && (
+                              <div
+                                className="flex justify-start"
+                                style={{ paddingLeft: '4px', marginTop: '4px' }}
+                              >
+                                <div className="rounded-xl overflow-hidden bg-white border border-gray-200 shadow-sm">
+                                  <div className="p-2 flex items-center gap-2">
+                                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-orange-400 to-pink-500 flex items-center justify-center text-lg">
+                                      🏐
+                                    </div>
+                                    <div>
+                                      <p className="font-semibold text-[12px] text-gray-900">
+                                        Volleyball Squad
+                                      </p>
+                                      <p className="text-[10px] text-gray-500">
+                                        12 members
+                                      </p>
+                                    </div>
+                                    <div className="ml-1 px-3 py-1 bg-blue-500 rounded-full">
+                                      <span className="text-white text-[10px] font-semibold">
+                                        Join
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </motion.div>
+                        ))}
+                      </div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* iMessage input bar */}
+                <div className="px-2 pt-1 pb-5 bg-[#F2F2F7]">
+                  <div className="flex items-center gap-1.5">
+                    <button className="w-7 h-7 flex items-center justify-center">
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 28 28"
+                        fill="none"
+                      >
+                        <circle cx="14" cy="14" r="12" fill="#007AFF" />
+                        <path
+                          d="M14 8V20M8 14H20"
+                          stroke="white"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </button>
+                    <div className="flex-1 h-[32px] bg-white rounded-full border border-gray-300 px-4 flex items-center">
+                      <span className="text-[14px] text-gray-400">
+                        iMessage
+                      </span>
+                    </div>
+                    <button className="w-7 h-7 flex items-center justify-center">
+                      <svg
+                        width="16"
+                        height="22"
+                        viewBox="0 0 20 26"
+                        fill="none"
+                      >
+                        <rect
+                          x="5"
+                          y="0"
+                          width="10"
+                          height="16"
+                          rx="5"
+                          fill="#007AFF"
+                        />
+                        <path
+                          d="M1 12C1 17 5 21 10 21C15 21 19 17 19 12"
+                          stroke="#007AFF"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
+                        <path
+                          d="M10 21V25M7 25H13"
+                          stroke="#007AFF"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Home indicator */}
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2">
+                  <div className="w-[100px] h-[5px] bg-black rounded-full" />
+                </div>
               </div>
             </div>
           </div>
@@ -524,8 +548,8 @@ export default function HeroSection() {
       {/* Main content */}
       <div className="relative z-10 h-screen flex items-center overflow-visible">
         <div className="container mx-auto px-6 lg:px-12 overflow-visible">
-          <div className="flex items-center justify-between gap-8 lg:gap-16 overflow-visible">
-            <div className="flex-1 flex justify-center lg:justify-end lg:pr-8 overflow-visible">
+          <div className="flex items-center justify-between gap-12 lg:gap-24 overflow-visible">
+            <div className="flex-1 flex justify-center lg:justify-end lg:pr-12 overflow-visible">
               <IPhoneWithMessages scrollProgress={scrollProgress} />
             </div>
 

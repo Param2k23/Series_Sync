@@ -23,6 +23,7 @@ import {
   Briefcase,
   X,
 } from 'lucide-react';
+import { signup, login, scrapeUserSocialMedia, getUserByPhone } from '@/lib/database';
 
 // Reddit icon component
 const RedditIcon = () => (
@@ -37,13 +38,21 @@ function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [error, setError] = useState('');
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const handleSendOtp = (e: React.FormEvent) => {
     e.preventDefault();
-    if (phone.length >= 10) {
-      setStep('otp');
+    setError('');
+    
+    // Check if user exists
+    const user = getUserByPhone(phone);
+    if (!user) {
+      setError('No account found with this phone number');
+      return;
     }
+    
+    setStep('otp');
   };
 
   const handleOtpChange = (index: number, value: string) => {
@@ -52,7 +61,6 @@ function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
       newOtp[index] = value;
       setOtp(newOtp);
       
-      // Auto-focus next input
       if (value && index < 5) {
         otpRefs.current[index + 1]?.focus();
       }
@@ -68,9 +76,15 @@ function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
   const handleVerifyOtp = (e: React.FormEvent) => {
     e.preventDefault();
     const otpValue = otp.join('');
+    
+    // For demo, accept any 6-digit OTP
     if (otpValue.length === 6) {
-      // Verify OTP and redirect to dashboard
-      router.push('/dashboard');
+      const user = login(phone);
+      if (user) {
+        router.push('/dashboard');
+      } else {
+        setError('Login failed. Please try again.');
+      }
     }
   };
 
@@ -78,6 +92,7 @@ function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
     setStep('phone');
     setPhone('');
     setOtp(['', '', '', '', '', '']);
+    setError('');
     onClose();
   };
 
@@ -85,7 +100,6 @@ function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
           <motion.div
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
             initial={{ opacity: 0 }}
@@ -94,7 +108,6 @@ function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
             onClick={handleClose}
           />
           
-          {/* Modal */}
           <motion.div
             className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md"
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -103,7 +116,6 @@ function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           >
             <div className="bg-white rounded-2xl shadow-2xl p-6 mx-4">
-              {/* Close button */}
               <button
                 onClick={handleClose}
                 className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors"
@@ -112,8 +124,8 @@ function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
               </button>
 
               <div className="text-center mb-6">
-                <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <Phone className="w-6 h-6 text-indigo-600" />
+                <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Phone className="w-6 h-6 text-slate-600" />
                 </div>
                 <h2 className="text-xl font-bold text-slate-900">
                   {step === 'phone' ? 'Welcome back' : 'Enter verification code'}
@@ -126,6 +138,12 @@ function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
                 </p>
               </div>
 
+              {error && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-100 rounded-lg text-red-600 text-sm">
+                  {error}
+                </div>
+              )}
+
               {step === 'phone' ? (
                 <form onSubmit={handleSendOtp} className="space-y-4">
                   <div className="space-y-2">
@@ -137,17 +155,20 @@ function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
                       <Input
                         id="login-phone"
                         type="tel"
-                        placeholder="+1 (555) 000-0000"
+                        placeholder="+1234567890"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
-                        className="pl-10 h-12 bg-slate-50 border-slate-200 rounded-xl focus:bg-white focus:border-indigo-500"
+                        className="pl-10 h-12 bg-slate-50 border-slate-200 rounded-xl focus:bg-white"
                         required
                       />
                     </div>
+                    <p className="text-xs text-slate-400">
+                      Demo: Use +1234567890 to +1234567899
+                    </p>
                   </div>
                   <Button
                     type="submit"
-                    className="w-full h-12 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold"
+                    className="w-full h-12 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold"
                   >
                     Send Code
                   </Button>
@@ -165,13 +186,16 @@ function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
                         value={digit}
                         onChange={(e) => handleOtpChange(index, e.target.value)}
                         onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                        className="w-12 h-14 text-center text-xl font-semibold bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
+                        className="w-12 h-14 text-center text-xl font-semibold bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-slate-400 focus:ring-2 focus:ring-slate-200 outline-none transition-all"
                       />
                     ))}
                   </div>
+                  <p className="text-xs text-slate-400 text-center">
+                    Demo: Enter any 6 digits
+                  </p>
                   <Button
                     type="submit"
-                    className="w-full h-12 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold"
+                    className="w-full h-12 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold"
                     disabled={otp.join('').length !== 6}
                   >
                     Verify & Sign In
@@ -179,7 +203,7 @@ function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
                   <button
                     type="button"
                     onClick={() => setStep('phone')}
-                    className="w-full text-sm text-slate-500 hover:text-indigo-600"
+                    className="w-full text-sm text-slate-500 hover:text-slate-700"
                   >
                     Use a different number
                   </button>
@@ -198,6 +222,8 @@ export default function SignupPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     username: '',
@@ -225,18 +251,61 @@ export default function SignupPage() {
   };
 
   const handleGoogleSignIn = () => {
-    console.log('Google Sign In');
+    console.log('Google Sign In - would integrate with OAuth');
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Signup:', { ...formData, profileImage });
-    router.push('/dashboard');
+    setError('');
+    setIsSubmitting(true);
+
+    try {
+      // Create user in database
+      const newUser = signup({
+        phone: formData.phone,
+        name: formData.name,
+        username: formData.username,
+        dob: formData.dob,
+        location: formData.location,
+        occupation: formData.occupation,
+        bio: formData.bio,
+        profileImage: profileImage || undefined,
+        socialProfiles: {
+          linkedin: formData.linkedin || undefined,
+          twitter: formData.twitter || undefined,
+          instagram: formData.instagram || undefined,
+          reddit: formData.reddit || undefined,
+        },
+        scrapedAttributes: {
+          interests: [],
+          skills: [],
+          industries: [],
+          topics: [],
+          sentiment: 'neutral',
+          activityLevel: 'low',
+        },
+      });
+
+      // Simulate scraping if social profiles provided
+      if (formData.linkedin || formData.twitter || formData.instagram || formData.reddit) {
+        scrapeUserSocialMedia(newUser.id, {
+          linkedin: formData.linkedin,
+          twitter: formData.twitter,
+          instagram: formData.instagram,
+          reddit: formData.reddit,
+        });
+      }
+
+      router.push('/dashboard');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Signup failed');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 relative overflow-hidden">
-      {/* Login Modal */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 relative overflow-hidden">
       <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
 
       {/* Decorative elements */}
@@ -244,17 +313,7 @@ export default function SignupPage() {
         <div 
           className="absolute top-20 right-20 w-72 h-72 rounded-full"
           style={{
-            background: 'radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%)',
-            filter: 'blur(40px)',
-          }}
-        />
-      </div>
-      
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] opacity-30 pointer-events-none">
-        <div 
-          className="absolute bottom-20 left-20 w-64 h-64 rounded-full"
-          style={{
-            background: 'radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(148, 163, 184, 0.15) 0%, transparent 70%)',
             filter: 'blur(40px)',
           }}
         />
@@ -306,7 +365,7 @@ export default function SignupPage() {
           {/* Header */}
           <div className="text-center mb-8">
             <motion.div
-              className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 mb-5 shadow-lg shadow-indigo-500/25"
+              className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-slate-900 mb-5 shadow-lg"
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ type: 'spring', stiffness: 200, damping: 15 }}
@@ -333,13 +392,19 @@ export default function SignupPage() {
 
           {/* Form Card */}
           <motion.div
-            className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8"
+            className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-200/60 p-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm">
+                {error}
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Google Sign In - alongside form */}
+              {/* Google Sign In */}
               <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100">
                 <motion.button
                   type="button"
@@ -372,7 +437,7 @@ export default function SignupPage() {
                   <motion.button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-24 h-24 rounded-full bg-slate-100 border-2 border-dashed border-slate-300 flex items-center justify-center overflow-hidden hover:border-indigo-400 hover:bg-slate-50 transition-all duration-200 group"
+                    className="w-24 h-24 rounded-full bg-slate-100 border-2 border-dashed border-slate-300 flex items-center justify-center overflow-hidden hover:border-slate-400 transition-all duration-200 group"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
@@ -380,8 +445,8 @@ export default function SignupPage() {
                       <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
                     ) : (
                       <div className="text-center">
-                        <Camera className="w-6 h-6 text-slate-400 group-hover:text-indigo-500 mx-auto transition-colors" />
-                        <span className="text-xs text-slate-400 group-hover:text-indigo-500 mt-1 block transition-colors">Add photo</span>
+                        <Camera className="w-6 h-6 text-slate-400 group-hover:text-slate-500 mx-auto transition-colors" />
+                        <span className="text-xs text-slate-400 group-hover:text-slate-500 mt-1 block transition-colors">Add photo</span>
                       </div>
                     )}
                   </motion.button>
@@ -389,7 +454,7 @@ export default function SignupPage() {
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="absolute bottom-0 right-0 w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center text-white shadow-lg hover:bg-indigo-600 transition-colors"
+                      className="absolute bottom-0 right-0 w-8 h-8 bg-slate-900 rounded-full flex items-center justify-center text-white shadow-lg hover:bg-slate-800 transition-colors"
                     >
                       <Camera className="w-4 h-4" />
                     </button>
@@ -411,7 +476,7 @@ export default function SignupPage() {
                       placeholder="John Doe"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="pl-10 h-11 bg-slate-50 border-slate-200 rounded-xl focus:bg-white focus:border-indigo-500"
+                      className="pl-10 h-11 bg-slate-50 border-slate-200 rounded-xl focus:bg-white"
                       required
                     />
                   </div>
@@ -429,7 +494,7 @@ export default function SignupPage() {
                       placeholder="johndoe"
                       value={formData.username}
                       onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                      className="pl-8 h-11 bg-slate-50 border-slate-200 rounded-xl focus:bg-white focus:border-indigo-500"
+                      className="pl-8 h-11 bg-slate-50 border-slate-200 rounded-xl focus:bg-white"
                       required
                     />
                   </div>
@@ -450,7 +515,7 @@ export default function SignupPage() {
                       placeholder="+1 (555) 000-0000"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="pl-10 h-11 bg-slate-50 border-slate-200 rounded-xl focus:bg-white focus:border-indigo-500"
+                      className="pl-10 h-11 bg-slate-50 border-slate-200 rounded-xl focus:bg-white"
                       required
                     />
                   </div>
@@ -468,7 +533,7 @@ export default function SignupPage() {
                       type="date"
                       value={formData.dob}
                       onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
-                      className="pl-10 h-11 bg-slate-50 border-slate-200 rounded-xl focus:bg-white focus:border-indigo-500"
+                      className="pl-10 h-11 bg-slate-50 border-slate-200 rounded-xl focus:bg-white"
                     />
                   </div>
                 </div>
@@ -488,7 +553,7 @@ export default function SignupPage() {
                       placeholder="San Francisco, CA"
                       value={formData.location}
                       onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                      className="pl-10 h-11 bg-slate-50 border-slate-200 rounded-xl focus:bg-white focus:border-indigo-500"
+                      className="pl-10 h-11 bg-slate-50 border-slate-200 rounded-xl focus:bg-white"
                     />
                   </div>
                 </div>
@@ -505,7 +570,7 @@ export default function SignupPage() {
                       placeholder="Software Engineer"
                       value={formData.occupation}
                       onChange={(e) => setFormData({ ...formData, occupation: e.target.value })}
-                      className="pl-10 h-11 bg-slate-50 border-slate-200 rounded-xl focus:bg-white focus:border-indigo-500"
+                      className="pl-10 h-11 bg-slate-50 border-slate-200 rounded-xl focus:bg-white"
                     />
                   </div>
                 </div>
@@ -524,7 +589,7 @@ export default function SignupPage() {
                     value={formData.bio}
                     onChange={(e) => setFormData({ ...formData, bio: e.target.value.slice(0, 200) })}
                     rows={3}
-                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 resize-none text-sm transition-all outline-none"
+                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-slate-300 resize-none text-sm transition-all outline-none"
                   />
                 </div>
                 <p className="text-slate-400 text-xs text-right">{formData.bio.length}/200</p>
@@ -542,7 +607,6 @@ export default function SignupPage() {
                   <span className="text-slate-400 text-xs">(helps us match you better)</span>
                 </button>
 
-                {/* Collapsible social handles */}
                 <motion.div
                   initial={false}
                   animate={{ 
@@ -553,7 +617,6 @@ export default function SignupPage() {
                   className="overflow-hidden"
                 >
                   <div className="pt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
-                    {/* LinkedIn */}
                     <div className="space-y-1.5">
                       <Label className="text-slate-600 text-xs font-medium flex items-center gap-1.5">
                         <Linkedin className="w-3.5 h-3.5 text-[#0A66C2]" />
@@ -564,11 +627,10 @@ export default function SignupPage() {
                         placeholder="username"
                         value={formData.linkedin}
                         onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
-                        className="h-9 text-sm bg-slate-50 border-slate-200 rounded-lg focus:bg-white focus:border-indigo-500"
+                        className="h-9 text-sm bg-slate-50 border-slate-200 rounded-lg focus:bg-white"
                       />
                     </div>
 
-                    {/* Twitter */}
                     <div className="space-y-1.5">
                       <Label className="text-slate-600 text-xs font-medium flex items-center gap-1.5">
                         <Twitter className="w-3.5 h-3.5 text-slate-800" />
@@ -579,11 +641,10 @@ export default function SignupPage() {
                         placeholder="@handle"
                         value={formData.twitter}
                         onChange={(e) => setFormData({ ...formData, twitter: e.target.value })}
-                        className="h-9 text-sm bg-slate-50 border-slate-200 rounded-lg focus:bg-white focus:border-indigo-500"
+                        className="h-9 text-sm bg-slate-50 border-slate-200 rounded-lg focus:bg-white"
                       />
                     </div>
 
-                    {/* Instagram */}
                     <div className="space-y-1.5">
                       <Label className="text-slate-600 text-xs font-medium flex items-center gap-1.5">
                         <Instagram className="w-3.5 h-3.5 text-[#E4405F]" />
@@ -594,11 +655,10 @@ export default function SignupPage() {
                         placeholder="@handle"
                         value={formData.instagram}
                         onChange={(e) => setFormData({ ...formData, instagram: e.target.value })}
-                        className="h-9 text-sm bg-slate-50 border-slate-200 rounded-lg focus:bg-white focus:border-indigo-500"
+                        className="h-9 text-sm bg-slate-50 border-slate-200 rounded-lg focus:bg-white"
                       />
                     </div>
 
-                    {/* Reddit */}
                     <div className="space-y-1.5">
                       <Label className="text-slate-600 text-xs font-medium flex items-center gap-1.5">
                         <span className="text-[#FF4500]"><RedditIcon /></span>
@@ -609,7 +669,7 @@ export default function SignupPage() {
                         placeholder="u/name"
                         value={formData.reddit}
                         onChange={(e) => setFormData({ ...formData, reddit: e.target.value })}
-                        className="h-9 text-sm bg-slate-50 border-slate-200 rounded-lg focus:bg-white focus:border-indigo-500"
+                        className="h-9 text-sm bg-slate-50 border-slate-200 rounded-lg focus:bg-white"
                       />
                     </div>
                   </div>
@@ -619,9 +679,10 @@ export default function SignupPage() {
               {/* Submit */}
               <Button
                 type="submit"
-                className="w-full h-12 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-semibold shadow-lg shadow-indigo-500/25 transition-all duration-200 mt-4"
+                disabled={isSubmitting}
+                className="w-full h-12 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold shadow-lg shadow-slate-900/10 transition-all duration-200 mt-4"
               >
-                Create Profile
+                {isSubmitting ? 'Creating Profile...' : 'Create Profile'}
               </Button>
             </form>
           </motion.div>
@@ -634,11 +695,11 @@ export default function SignupPage() {
             transition={{ delay: 0.4 }}
           >
             By continuing, you agree to our{' '}
-            <Link href="/terms" className="text-slate-500 hover:text-indigo-600 underline underline-offset-2">
+            <Link href="/terms" className="text-slate-500 hover:text-slate-700 underline underline-offset-2">
               Terms
             </Link>{' '}
             and{' '}
-            <Link href="/privacy" className="text-slate-500 hover:text-indigo-600 underline underline-offset-2">
+            <Link href="/privacy" className="text-slate-500 hover:text-slate-700 underline underline-offset-2">
               Privacy Policy
             </Link>
           </motion.p>
