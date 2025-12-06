@@ -88,3 +88,12 @@ htmlcov/
 *.bak
 *.orig
 *.tmp
+credentials.json
+credentials.json.*
+*.credentials.json
+credentials.json/
+
+token.json
+token.json.*
+*.token.json
+token.json/
