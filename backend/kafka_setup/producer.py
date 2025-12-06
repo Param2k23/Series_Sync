@@ -1,47 +1,47 @@
-# Python Kafka Producer Example
-# Install: pip install kafka-python
-
 from kafka import KafkaProducer
 import json
 import os
 from dotenv import load_dotenv
+import certifi
+import ssl
 
-# Load environment variables from .env file
-load_dotenv()
+# Build a path to: series_hackathon/backend/.env
+env_path = os.path.join(os.path.dirname(__file__), "..", ".env")
+env_path = os.path.abspath(env_path)
 
-# Kafka Configuration
-bootstrap_servers = os.getenv('bootstrap_servers')
-topic_name = os.getenv('topic_name')
-api_key = os.getenv('api_key')
-api_secret = os.getenv('api_secret')
+print("Loading .env from:", env_path)
+load_dotenv(env_path)
 
-# Initialize Producer
-producer = KafkaProducer(
-    bootstrap_servers=bootstrap_servers.split(','),
-    security_protocol='SASL_SSL',
-    sasl_mechanism='PLAIN',
-    sasl_plain_username=api_key,
-    sasl_plain_password=api_secret,
-    value_serializer=lambda v: json.dumps(v).encode('utf-8')
-)
+def create_producer(bootstrap_servers=None, api_key=None, api_secret=None):
+    """
+    Return an initialized KafkaProducer.
+    Reads from env vars if args are None:
+      - bootstrap_servers (comma-separated string)
+      - api_key
+      - api_secret
+    """
+    bootstrap = bootstrap_servers or os.getenv('bootstrap_servers')
+    if not bootstrap:
+        raise ValueError('bootstrap_servers is required (arg or env var `bootstrap_servers`)')
 
-# Send a message
-message = {
-    'event': 'test_message',
-    'data': {
-        'message': 'Hello from Series Sync!',
-        'timestamp': '2024-01-01T00:00:00Z'
+    print(f"Creating Kafka producer for servers: {bootstrap}")
+    username = 'QRHNR6BCKVHD4M3U'
+    print(f"Using username: {username}")
+    password = api_secret or os.getenv('api_secret')
+    print(f"Using password: {password}")
+    if not username or not password:
+        raise ValueError('api_key and api_secret are required (args or env vars `api_key` and `api_secret`)')
+    context = ssl.create_default_context(cafile=certifi.where())
+    configs = {
+        'bootstrap_servers': bootstrap.split(','),
+        'security_protocol': 'SASL_SSL',
+        'sasl_mechanism': 'PLAIN',
+        'ssl_context': context,
+        'value_serializer': lambda v: json.dumps(v).encode('utf-8'),
     }
-}
+    if username is not None:
+        configs['sasl_plain_username'] = username
+    if password is not None:
+        configs['sasl_plain_password'] = password
 
-try:
-    future = producer.send(topic_name, value=message)
-    record_metadata = future.get(timeout=10)
-    print(f"Message sent successfully!")
-    print(f"Topic: {record_metadata.topic}")
-    print(f"Partition: {record_metadata.partition}")
-    print(f"Offset: {record_metadata.offset}")
-except Exception as e:
-    print(f"Error sending message: {e}")
-finally:
-    producer.close()
+    return KafkaProducer(**configs)

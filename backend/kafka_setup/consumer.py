@@ -1,44 +1,49 @@
-# Python Kafka Consumer Example
-# Install: pip install kafka-python
-
 from kafka import KafkaConsumer
 import json
 import os
 from dotenv import load_dotenv
-# Load environment variables from .env file
-load_dotenv()
 
-# Kafka Configuration
-bootstrap_servers = os.getenv('bootstrap_servers')
-topic_name = os.getenv('topic_name')
-api_key = os.getenv('api_key')
-api_secret = os.getenv('api_secret')
+# Build a path to: series_hackathon/backend/.env
+env_path = os.path.join(os.path.dirname(__file__), "..", ".env")
+env_path = os.path.abspath(env_path)
 
-# Initialize Consumer
-consumer = KafkaConsumer(
-    topic_name,
-    bootstrap_servers=bootstrap_servers.split(','),
-    security_protocol='SASL_SSL',
-    sasl_mechanism='PLAIN',
-    sasl_plain_username=api_key,
-    sasl_plain_password=api_secret,
-    value_deserializer=lambda m: json.loads(m.decode('utf-8')),
-    auto_offset_reset='earliest',
-    enable_auto_commit=True,
-    group_id='team-cg-91abd2354c1c42b0a1caaf16c18b93a6'
-)
+print("Loading .env from:", env_path)
+load_dotenv(env_path)
 
-print(f"Listening to topic: {topic_name}")
-print("Waiting for messages... (Press Ctrl+C to stop)")
+def create_consumer(topic=None, bootstrap_servers=None, api_key=None, api_secret=None, group_id=None):
+    """
+    Return an initialized KafkaConsumer subscribed to `topic`.
+    Reads from env vars if args are None:
+      - bootstrap_servers (comma-separated string)
+      - api_key
+      - api_secret
+      - group_id
+    """
 
-try:
-    for message in consumer:
-        print(f"\nReceived message:")
-        print(f"Topic: {message.topic}")
-        print(f"Partition: {message.partition}")
-        print(f"Offset: {message.offset}")
-        print(f"Value: {message.value}")
-except KeyboardInterrupt:
-    print("\nStopping consumer...")
-finally:
-    consumer.close()
+    bootstrap = bootstrap_servers or os.getenv('bootstrap_servers')
+    if not bootstrap:
+        raise ValueError('bootstrap_servers is required (arg or env var `bootstrap_servers`)')
+
+    username = 'QRHNR6BCKVHD4M3U'
+    password = api_secret or os.getenv('api_secret')
+    if not username or not password:
+        raise ValueError('api_key and api_secret are required (args or env vars `api_key` and `api_secret`)')
+    group = group_id or os.getenv('group_id')
+    topic = topic or os.getenv('topic_name')
+    configs = {
+        'bootstrap_servers': bootstrap.split(','),
+        'security_protocol': 'SASL_SSL',
+        'sasl_mechanism': 'PLAIN',
+        'value_deserializer': lambda m: json.loads(m.decode('utf-8')),
+        'auto_offset_reset': 'earliest',
+        'enable_auto_commit': True,
+    }
+
+    if group is not None:
+        configs['group_id'] = group
+    if username is not None:
+        configs['sasl_plain_username'] = username
+    if password is not None:
+        configs['sasl_plain_password'] = password
+
+    return KafkaConsumer(topic, **configs)
