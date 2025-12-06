@@ -73,31 +73,53 @@ async def search_events_tool(query=None, count=10):
         return f"❌ Calendar Search Error: {e}"
 
 # --- 2. CREATE ---
-async def create_event_tool(summary, start_time_str, duration_minutes=60):
+async def create_event_tool(summary, start_time_str, duration_minutes=60, time_zone=None):
     """
     Creates an event.
-    start_time_str example: '2025-12-06T15:00:00'
+    - start_time_str example: '2025-12-06T17:00:00' or '2025-12-06T17:00:00-05:00' or '2025-12-06T17:00:00Z'
+    - If the string has no timezone offset, we assume the system local timezone (or `time_zone` if provided),
+      convert to UTC and send UTC ISO to Google Calendar to avoid shifts.
     """
     try:
         service = get_service()
-        if not service: return "❌ Error: Missing credentials.json"
-        
-        # Parse Time
+        if not service:
+            return "❌ Error: Missing credentials.json"
+
+        # Parse Time (ISO)
         try:
             start_dt = datetime.datetime.fromisoformat(start_time_str)
-        except ValueError:
-            return "❌ Error: Date format must be ISO (YYYY-MM-DDTHH:MM:SS)"
+        except Exception:
+            return "❌ Error: Date format must be ISO (YYYY-MM-DDTHH:MM:SS) optionally with timezone offset."
 
-        end_dt = start_dt + datetime.timedelta(minutes=duration_minutes)
+        # Detect whether parsed datetime is timezone-aware
+        if start_dt.tzinfo is None:
+            # If caller provided an explicit IANA timezone string (e.g., 'America/Chicago'), try to use it
+            try:
+                if time_zone:
+                    from zoneinfo import ZoneInfo  # Python 3.9+
+                    tz = ZoneInfo(time_zone)
+                else:
+                    # Use the system local timezone
+                    tz = datetime.datetime.now().astimezone().tzinfo
+                # Attach the timezone to the naive datetime (interpret input as local to that zone)
+                start_dt = start_dt.replace(tzinfo=tz)
+            except Exception:
+                # Fallback: assume system local tz offset
+                start_dt = start_dt.replace(tzinfo=datetime.datetime.now().astimezone().tzinfo)
 
+        # Convert to UTC for Google API (returns tz-aware datetime in UTC)
+        start_utc = start_dt.astimezone(datetime.timezone.utc)
+        end_utc = (start_dt + datetime.timedelta(minutes=duration_minutes)).astimezone(datetime.timezone.utc)
+
+        # Prepare event body - use UTC ISO strings and indicate timeZone='UTC'
         event_body = {
             'summary': summary,
-            'start': {'dateTime': start_dt.isoformat(), 'timeZone': 'UTC'},
-            'end': {'dateTime': end_dt.isoformat(), 'timeZone': 'UTC'},
+            'start': {'dateTime': start_utc.isoformat(), 'timeZone': 'UTC'},
+            'end': {'dateTime': end_utc.isoformat(), 'timeZone': 'UTC'},
         }
 
         event = service.events().insert(calendarId='primary', body=event_body).execute()
-        return f"✅ Event Created: '{summary}' at {start_time_str} (Link: {event.get('htmlLink')})"
+        return f"✅ Event Created: '{summary}' at {start_dt.isoformat()} (local). Link: {event.get('htmlLink')}"
 
     except Exception as e:
         return f"❌ Create Event Error: {e}"

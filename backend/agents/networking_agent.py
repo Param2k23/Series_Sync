@@ -27,6 +27,11 @@ networking_tools = [
                 "properties": {
                     # Optional, because the tool will auto-lookup from memory
                     "name": {"type": "string"},
+                    "names": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "List of names to include in the group."
+                    }
                 },
                 "required": ["name"]
             }
@@ -59,21 +64,36 @@ async def run_networking_agent(query, context, session, chat_id, user_phone):
         tool_call = msg.tool_calls[0]
         func_name = tool_call.function.name
         args = json.loads(tool_call.function.arguments)
-        
+
         print(f"   🛠 Tool: {func_name}")
         tool_result = ""
 
         if func_name == "find_match":
-            # Pass user_phone so we can save the context
             tool_result = await find_match_tool(user_phone)
-        
-        elif func_name == "connect_instantly":
-            # Pass user_phone so we can look up the context
-            tool_result = await create_instant_group_tool(user_phone, args["name"])
 
+        elif func_name == "connect_instantly":
+            # If you later support multiple names, adapt here to pass a list
+            tool_result = await create_instant_group_tool(user_phone, args.get("name"))
+
+        # --- IMPORTANT: attach the assistant message that made the tool call ---
         messages.append(msg)
-        messages.append({"role": "tool", "tool_call_id": tool_call.id, "content": str(tool_result)})
-        
+
+        # Prepare the tool response content (stringify dicts/lists)
+        if isinstance(tool_result, (dict, list)):
+            tool_content = json.dumps(tool_result)
+        else:
+            tool_content = str(tool_result)
+
+        # Append a properly formatted tool-response message so the API accepts it:
+        # Must include role="tool", tool_call_id (from the original tool_call), name (tool name), and content.
+        messages.append({
+            "role": "tool",
+            "tool_call_id": tool_call.id,
+            "name": func_name,
+            "content": tool_content
+        })
+
+        # Now call the model again with the assistant -> tool response included
         final_res = await client.chat.completions.create(model="gpt-4o", messages=messages)
         return final_res.choices[0].message.content
 

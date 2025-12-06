@@ -1,0 +1,524 @@
+{
+  "users": [
+    {
+      "id": "user-1",
+      "name": "Harsh Shah",
+      "age": 25,
+      "number": "+15164341033",
+      "place": "San Francisco, CA",
+      "bio": "Tech enthusiast and startup founder. Love building products that make a difference.",
+      "socials": {
+        "instagram": "@harshshah",
+        "linkedin": "harsh-shah",
+        "twitter": "@harshshah"
+      },
+      "work": {
+        "company": "TechStart Inc",
+        "role": "Founder & CEO",
+        "industry": "Technology",
+        "experience_years": 5
+      },
+      "skills": {
+        "technical": [
+          "Python",
+          "JavaScript",
+          "React",
+          "Node.js",
+          "Machine Learning"
+        ],
+        "soft": [
+          "Leadership",
+          "Product Management",
+          "Strategic Planning"
+        ]
+      },
+      "attributes": {
+        "interests": [
+          "Technology",
+          "Startups",
+          "AI/ML",
+          "Product Design",
+          "Innovation"
+        ],
+        "personality": [
+          "Ambitious",
+          "Creative",
+          "Analytical",
+          "Risk-taker"
+        ],
+        "values": [
+          "Innovation",
+          "Impact",
+          "Growth",
+          "Collaboration"
+        ],
+        "lifestyle": [
+          "Active",
+          "Social",
+          "Tech-savvy"
+        ],
+        "communication_style": [
+          "Direct",
+          "Enthusiastic",
+          "Visionary"
+        ]
+      },
+      "vector_attributes": {
+        "tech_interest": 1.0,
+        "entrepreneurship": 1.0,
+        "innovation": 0.9893029132000001,
+        "leadership": 0.9780989893,
+        "creativity": 0.8951911415,
+        "analytical_thinking": 0.9107196195,
+        "risk_taking": 0.9118215220000001,
+        "social_activity": 0.772760761,
+        "collaboration": 0.8165196195,
+        "ambition": 1.0
+      },
+      "vibe_attributes": {
+        "energy_level": 0.9893911415000001,
+        "humor_style": 0.7503303805000001,
+        "conversation_depth": 0.8386196195,
+        "openness": 0.7554696195000001,
+        "reliability": 0.8686856956000002
+      },
+      "groups": [
+        "group-1",
+        "group-2",
+        "group-3"
+      ],
+      "connections": [],
+      "created_at": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "user-2",
+      "name": "Param Patel",
+      "age": 27,
+      "number": "+19342463396",
+      "place": "New York, NY",
+      "bio": "Software engineer passionate about building scalable systems and mentoring others.",
+      "socials": {
+        "instagram": "@parampatel",
+        "linkedin": "param-patel",
+        "twitter": "@parampatel"
+      },
+      "work": {
+        "company": "ScaleTech Solutions",
+        "role": "Senior Software Engineer",
+        "industry": "Technology",
+        "experience_years": 6
+      },
+      "skills": {
+        "technical": [
+          "Python",
+          "Java",
+          "System Design",
+          "Cloud Architecture",
+          "DevOps"
+        ],
+        "soft": [
+          "Mentoring",
+          "Problem Solving",
+          "Team Collaboration"
+        ]
+      },
+      "attributes": {
+        "interests": [
+          "Technology",
+          "System Architecture",
+          "Mentoring",
+          "Open Source",
+          "Engineering"
+        ],
+        "personality": [
+          "Detail-oriented",
+          "Patient",
+          "Supportive",
+          "Methodical"
+        ],
+        "values": [
+          "Excellence",
+          "Knowledge Sharing",
+          "Teamwork",
+          "Quality"
+        ],
+        "lifestyle": [
+          "Balanced",
+          "Professional",
+          "Learning-focused"
+        ],
+        "communication_style": [
+          "Clear",
+          "Supportive",
+          "Technical"
+        ]
+      },
+      "vector_attributes": {
+        "tech_interest": 0.90787547,
+        "entrepreneurship": 0.6191698,
+        "innovation": 0.7515018800000001,
+        "leadership": 0.69746037,
+        "creativity": 0.63937735,
+        "analytical_thinking": 0.9702075499999998,
+        "risk_taking": 0.5191698,
+        "social_activity": 0.6095849,
+        "collaboration": 0.92020755,
+        "ambition": 0.6715180000000001
+      },
+      "vibe_attributes": {
+        "energy_level": 0.68937735,
+        "humor_style": 0.6797924499999999,
+        "conversation_depth": 0.92020755,
+        "openness": 0.8702075499999998,
+        "reliability": 0.93616604
+      },
+      "groups": [
+        "group-1",
+        "group-2",
+        "group-3"
+      ],
+      "connections": [],
+      "created_at": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "user-3",
+      "name": "Sarah Chen",
+      "age": 28,
+      "number": "+14155551234",
+      "place": "Seattle, WA",
+      "bio": "Product designer focused on creating intuitive user experiences.",
+      "socials": {
+        "instagram": "@sarahchen",
+        "linkedin": "sarah-chen",
+        "twitter": "@sarahchen"
+      },
+      "work": {
+        "company": "Design Studio Pro",
+        "role": "Senior Product Designer",
+        "industry": "Design",
+        "experience_years": 7
+      },
+      "skills": {
+        "technical": [
+          "Figma",
+          "Sketch",
+          "Prototyping",
+          "User Research",
+          "Design Systems"
+        ],
+        "soft": [
+          "Empathy",
+          "Communication",
+          "Creative Problem Solving"
+        ]
+      },
+      "attributes": {
+        "interests": [
+          "Design",
+          "User Experience",
+          "Psychology",
+          "Art",
+          "Innovation"
+        ],
+        "personality": [
+          "Creative",
+          "Empathetic",
+          "Detail-oriented",
+          "Collaborative"
+        ],
+        "values": [
+          "User-centric",
+          "Aesthetics",
+          "Innovation",
+          "Collaboration"
+        ],
+        "lifestyle": [
+          "Creative",
+          "Social",
+          "Artistic"
+        ],
+        "communication_style": [
+          "Visual",
+          "Empathetic",
+          "Collaborative"
+        ]
+      },
+      "vector_attributes": {
+        "tech_interest": 0.6384163017,
+        "entrepreneurship": 0.5765,
+        "innovation": 0.8222649154799999,
+        "leadership": 0.64463074177,
+        "creativity": 0.9609123943499999,
+        "analytical_thinking": 0.71800086855,
+        "risk_taking": 0.6578265257999999,
+        "social_activity": 0.8653782629,
+        "collaboration": 0.9166208685500001,
+        "ambition": 0.758
+      },
+      "vibe_attributes": {
+        "energy_level": 0.7622923943500001,
+        "humor_style": 0.86984413145,
+        "conversation_depth": 0.7923108685500001,
+        "openness": 0.92877586855,
+        "reliability": 0.84627969484
+      },
+      "groups": [],
+      "connections": [],
+      "created_at": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "user-4",
+      "name": "Michael Rodriguez",
+      "age": 30,
+      "number": "+14155552345",
+      "place": "Austin, TX",
+      "bio": "Data scientist and ML engineer passionate about AI applications.",
+      "socials": {
+        "instagram": "@mrodriguez",
+        "linkedin": "michael-rodriguez",
+        "twitter": "@mrodriguez"
+      },
+      "work": {
+        "company": "AI Innovations Lab",
+        "role": "Lead Data Scientist",
+        "industry": "Technology",
+        "experience_years": 8
+      },
+      "skills": {
+        "technical": [
+          "Python",
+          "TensorFlow",
+          "PyTorch",
+          "Data Analysis",
+          "Machine Learning"
+        ],
+        "soft": [
+          "Research",
+          "Analytical Thinking",
+          "Presentation"
+        ]
+      },
+      "attributes": {
+        "interests": [
+          "AI/ML",
+          "Data Science",
+          "Research",
+          "Technology",
+          "Innovation"
+        ],
+        "personality": [
+          "Analytical",
+          "Curious",
+          "Patient",
+          "Methodical"
+        ],
+        "values": [
+          "Knowledge",
+          "Innovation",
+          "Accuracy",
+          "Research"
+        ],
+        "lifestyle": [
+          "Academic",
+          "Focused",
+          "Research-oriented"
+        ],
+        "communication_style": [
+          "Technical",
+          "Precise",
+          "Data-driven"
+        ]
+      },
+      "vector_attributes": {
+        "tech_interest": 0.95,
+        "entrepreneurship": 0.6,
+        "innovation": 0.9,
+        "leadership": 0.7,
+        "creativity": 0.75,
+        "analytical_thinking": 0.98,
+        "risk_taking": 0.55,
+        "social_activity": 0.6,
+        "collaboration": 0.75,
+        "ambition": 0.7
+      },
+      "vibe_attributes": {
+        "energy_level": 0.7,
+        "humor_style": 0.65,
+        "conversation_depth": 0.95,
+        "openness": 0.75,
+        "reliability": 0.9
+      },
+      "groups": [],
+      "connections": [],
+      "created_at": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "user-5",
+      "name": "Emily Johnson",
+      "age": 26,
+      "number": "+14155553456",
+      "place": "Boston, MA",
+      "bio": "Marketing strategist and startup advisor. Love connecting people and ideas.",
+      "socials": {
+        "instagram": "@emilyjohnson",
+        "linkedin": "emily-johnson",
+        "twitter": "@emilyjohnson"
+      },
+      "work": {
+        "company": "Growth Marketing Co",
+        "role": "Marketing Director",
+        "industry": "Marketing",
+        "experience_years": 5
+      },
+      "skills": {
+        "technical": [
+          "Digital Marketing",
+          "Analytics",
+          "Content Strategy",
+          "SEO",
+          "Social Media"
+        ],
+        "soft": [
+          "Networking",
+          "Communication",
+          "Strategic Thinking"
+        ]
+      },
+      "attributes": {
+        "interests": [
+          "Marketing",
+          "Startups",
+          "Networking",
+          "Growth",
+          "Innovation"
+        ],
+        "personality": [
+          "Outgoing",
+          "Strategic",
+          "Energetic",
+          "Connector"
+        ],
+        "values": [
+          "Growth",
+          "Connections",
+          "Innovation",
+          "Impact"
+        ],
+        "lifestyle": [
+          "Social",
+          "Active",
+          "Network-focused"
+        ],
+        "communication_style": [
+          "Engaging",
+          "Persuasive",
+          "Enthusiastic"
+        ]
+      },
+      "vector_attributes": {
+        "tech_interest": 0.75,
+        "entrepreneurship": 0.85,
+        "innovation": 0.8,
+        "leadership": 0.85,
+        "creativity": 0.8,
+        "analytical_thinking": 0.75,
+        "risk_taking": 0.8,
+        "social_activity": 0.95,
+        "collaboration": 0.9,
+        "ambition": 0.9
+      },
+      "vibe_attributes": {
+        "energy_level": 0.95,
+        "humor_style": 0.9,
+        "conversation_depth": 0.75,
+        "openness": 0.95,
+        "reliability": 0.8
+      },
+      "groups": [],
+      "connections": [],
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  ],
+  "groups": [
+    {
+      "id": "group-1",
+      "name": "Harsh & Param",
+      "member_ids": [
+        "user-1",
+        "user-2"
+      ],
+      "created_at": "2025-12-06T14:12:14.987151"
+    },
+    {
+      "id": "group-2",
+      "name": "Harsh & Param",
+      "member_ids": [
+        "user-1",
+        "user-2"
+      ],
+      "created_at": "2025-12-06T14:19:00.350273"
+    },
+    {
+      "id": "group-3",
+      "name": "Harsh & Param",
+      "member_ids": [
+        "user-1",
+        "user-2"
+      ],
+      "created_at": "2025-12-06T14:19:09.926381"
+    }
+  ],
+  "vibe_matches": [
+    {
+      "user1_id": "user-1",
+      "user2_id": "user-2",
+      "vibe_match": false,
+      "timestamp": "2025-12-06T14:12:14.988217"
+    },
+    {
+      "user1_id": "user-1",
+      "user2_id": "user-2",
+      "vibe_match": false,
+      "timestamp": "2025-12-06T14:19:00.352814"
+    },
+    {
+      "user1_id": "user-1",
+      "user2_id": "user-2",
+      "vibe_match": false,
+      "timestamp": "2025-12-06T14:19:09.929734"
+    },
+    {
+      "user1_id": "user-1",
+      "user2_id": "user-3",
+      "vibe_match": false,
+      "timestamp": "2025-12-06T14:24:05.423245"
+    },
+    {
+      "user1_id": "user-1",
+      "user2_id": "user-3",
+      "vibe_match": false,
+      "timestamp": "2025-12-06T14:24:16.636356"
+    }
+  ],
+  "attribute_weights": {
+    "vector_attributes": {
+      "tech_interest": 0.5687082283,
+      "entrepreneurship": 0.6443302000000001,
+      "innovation": 0.5693029131999999,
+      "leadership": 0.5980989892999999,
+      "creativity": 0.5650318585,
+      "analytical_thinking": 0.5474606195,
+      "risk_taking": 0.6118215220000002,
+      "social_activity": 0.5507212390000001,
+      "collaboration": 0.5334803805,
+      "ambition": 0.6154819999999999
+    },
+    "vibe_attributes": {
+      "energy_level": 0.5893911415,
+      "humor_style": 0.5364106195,
+      "conversation_depth": 0.5253606195,
+      "openness": 0.5445303804999999,
+      "reliability": 0.5180784956
+    }
+  }
+}
