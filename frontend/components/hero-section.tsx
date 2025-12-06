@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, useRef } from 'react';
 import { motion, AnimatePresence, useScroll } from 'framer-motion';
 import { MoveRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 // iMessage CSS styles
 const iMessageStyles = `
@@ -576,13 +577,15 @@ export default function HeroSection() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.6, ease: 'easeOut' }}
               >
-                <Button
-                  size="lg"
-                  className="gap-3 px-6 py-5 lg:px-8 lg:py-6 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 text-sm lg:text-base font-semibold shadow-xl shadow-primary/25 hover:shadow-primary/35 hover:scale-[1.02] transition-all duration-200"
-                >
-                  Get Started
-                  <MoveRight className="w-4 h-4 lg:w-5 lg:h-5" />
-                </Button>
+                <Link href="/signup">
+                  <Button
+                    size="lg"
+                    className="gap-3 px-6 py-5 lg:px-8 lg:py-6 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 text-sm lg:text-base font-semibold shadow-xl shadow-primary/25 hover:shadow-primary/35 hover:scale-[1.02] transition-all duration-200"
+                  >
+                    Get Started
+                    <MoveRight className="w-4 h-4 lg:w-5 lg:h-5" />
+                  </Button>
+                </Link>
               </motion.div>
             </div>
           </div>
