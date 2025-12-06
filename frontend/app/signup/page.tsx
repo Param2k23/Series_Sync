@@ -115,10 +115,10 @@ function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           >
-            <div className="bg-white rounded-2xl shadow-2xl p-6 mx-4">
+            <div className="relative bg-white rounded-2xl shadow-2xl p-6 mx-4">
               <button
                 onClick={handleClose}
-                className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors"
+                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-all z-10"
               >
                 <X className="w-5 h-5" />
               </button>

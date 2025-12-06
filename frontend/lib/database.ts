@@ -40,7 +40,6 @@ export interface Connection {
   connectedUserId: string;
   strength: number; // 0-100 based on shared attributes
   sharedAttributes: string[];
-  group?: string;
   createdAt: string;
 }
 
@@ -60,7 +59,6 @@ export interface Group {
 export interface Database {
   users: User[];
   connections: Connection[];
-  groups: Group[];
 }
 
 // Initial mock data
@@ -381,68 +379,13 @@ const initialDatabase: Database = {
     },
   ],
   connections: [],
-  groups: [
-    {
-      id: 'group-1',
-      name: 'Tech Builders',
-      color: '#3b82f6',
-      memberIds: ['user-2', 'user-8', 'user-9'],
-      basedOn: ['React', 'TypeScript', 'Engineering'],
-      isTemporary: false,
-      upvotes: 15,
-      upvotedBy: ['user-2', 'user-8', 'user-9'],
-      createdAt: '2024-01-01',
-    },
-    {
-      id: 'group-2',
-      name: 'Design Crew',
-      color: '#8b5cf6',
-      memberIds: ['user-1', 'user-7'],
-      basedOn: ['UI/UX', 'Design', 'User Research'],
-      isTemporary: false,
-      upvotes: 12,
-      upvotedBy: ['user-1', 'user-7'],
-      createdAt: '2024-01-02',
-    },
-    {
-      id: 'group-3',
-      name: 'Startup Network',
-      color: '#10b981',
-      memberIds: ['user-3', 'user-5', 'user-6', 'user-10'],
-      basedOn: ['Startups', 'Entrepreneurship', 'Growth'],
-      isTemporary: false,
-      upvotes: 20,
-      upvotedBy: ['user-3', 'user-5', 'user-6', 'user-10'],
-      createdAt: '2024-01-03',
-    },
-    {
-      id: 'group-4',
-      name: 'Data & AI',
-      color: '#f59e0b',
-      memberIds: ['user-4'],
-      basedOn: ['Machine Learning', 'Data Science', 'AI'],
-      isTemporary: false,
-      upvotes: 5,
-      upvotedBy: ['user-4'],
-      createdAt: '2024-01-04',
-    },
-  ],
 };
 
 // Storage key
 const STORAGE_KEY = 'series_sync_db';
 const CURRENT_USER_KEY = 'series_sync_current_user';
 
-// Migrate groups to ensure they have all required fields
-function migrateGroups(groups: Group[]): Group[] {
-  return groups.map((group) => ({
-    ...group,
-    isTemporary: group.isTemporary ?? false,
-    upvotes: group.upvotes ?? 0,
-    upvotedBy: group.upvotedBy ?? [],
-    createdAt: group.createdAt ?? new Date().toISOString(),
-  }));
-}
+// Groups removed - singular model only
 
 // Initialize database
 function initDatabase(): Database {
@@ -451,8 +394,14 @@ function initDatabase(): Database {
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored) {
     const db = JSON.parse(stored);
-    // Migrate groups to ensure they have all required fields
-    db.groups = migrateGroups(db.groups);
+    // Remove groups if they exist (migration to singular model)
+    if (db.groups) {
+      delete db.groups;
+    }
+    // Ensure connections exist
+    if (!db.connections) {
+      db.connections = [];
+    }
     return db;
   }
 
@@ -727,208 +676,37 @@ export function getAllConnections(): Connection[] {
 
 // ============ GROUP FUNCTIONS ============
 
+// Groups removed - singular model only
 export function getGroups(): Group[] {
-  const db = getDatabase();
-  return db.groups;
+  return [];
 }
 
 export function getGroupsForUser(userId: string): Group[] {
-  const db = getDatabase();
-  return db.groups.filter((g) => g.memberIds.includes(userId));
+  return [];
 }
 
 export function addUserToGroup(userId: string, groupId: string): void {
-  const db = getDatabase();
-  const group = db.groups.find((g) => g.id === groupId);
-
-  if (group && !group.memberIds.includes(userId)) {
-    group.memberIds.push(userId);
-    saveDatabase(db);
-  }
+  // Groups removed
 }
 
 // ============ TEMPORARY GROUP FUNCTIONS ============
 
-// Algorithm to form temporary groups based on shared attributes
+// Groups removed - singular model only
 export function formTemporaryGroups(): Group[] {
-  const db = getDatabase();
-  const now = new Date();
-  const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 hours
-
-  // Clean up expired temporary groups
-  db.groups = db.groups.filter(
-    (g) => !g.isTemporary || (g.expiresAt && new Date(g.expiresAt) > now)
-  );
-
-  const newGroups: Group[] = [];
-  const processedUsers = new Set<string>();
-
-  // Group formation algorithm:
-  // 1. Find users with high attribute overlap (>= 3 shared attributes)
-  // 2. Form groups of 3-6 members
-  // 3. Name groups based on most common shared attributes
-
-  for (let i = 0; i < db.users.length; i++) {
-    if (processedUsers.has(db.users[i].id)) continue;
-
-    const user1 = db.users[i];
-    const potentialMembers: Array<{
-      user: User;
-      sharedCount: number;
-      sharedAttrs: string[];
-    }> = [];
-
-    // Find users with significant overlap
-    for (let j = i + 1; j < db.users.length; j++) {
-      if (processedUsers.has(db.users[j].id)) continue;
-
-      const user2 = db.users[j];
-      const { sharedAttributes } = calculateConnectionStrength(user1, user2);
-
-      if (sharedAttributes.length >= 3) {
-        potentialMembers.push({
-          user: user2,
-          sharedCount: sharedAttributes.length,
-          sharedAttrs: sharedAttributes,
-        });
-      }
-    }
-
-    // Sort by shared attributes count
-    potentialMembers.sort((a, b) => b.sharedCount - a.sharedCount);
-
-    // Form groups of 3-6 members
-    if (potentialMembers.length >= 2) {
-      const groupSize = Math.min(5, potentialMembers.length + 1); // +1 for user1
-      const selectedMembers = potentialMembers.slice(0, groupSize - 1);
-
-      // Find most common shared attributes
-      const allSharedAttrs = selectedMembers.flatMap((m) => m.sharedAttrs);
-      const attrCounts: { [key: string]: number } = {};
-      allSharedAttrs.forEach((attr) => {
-        attrCounts[attr] = (attrCounts[attr] || 0) + 1;
-      });
-
-      const topAttrs = Object.entries(attrCounts)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 3)
-        .map(([attr]) => attr);
-
-      // Generate group name from top attributes
-      let groupName = 'New Group';
-      if (topAttrs.length > 0) {
-        const secondAttr = topAttrs.length > 1 ? ` & ${topAttrs[1]}` : '';
-        groupName = `${topAttrs[0]}${secondAttr}`;
-      }
-
-      // Generate color based on attributes hash
-      const colorHash = topAttrs
-        .join('')
-        .split('')
-        .reduce((acc, char) => acc + char.charCodeAt(0), 0);
-      const colors = [
-        '#3b82f6',
-        '#8b5cf6',
-        '#10b981',
-        '#f59e0b',
-        '#ef4444',
-        '#06b6d4',
-        '#a855f7',
-      ];
-      const groupColor = colors[colorHash % colors.length];
-
-      const memberIds = [user1.id, ...selectedMembers.map((m) => m.user.id)];
-
-      const newGroup: Group = {
-        id: `temp-group-${Date.now()}-${Math.random()
-          .toString(36)
-          .slice(2, 11)}`,
-        name: groupName,
-        color: groupColor,
-        memberIds,
-        basedOn: topAttrs,
-        isTemporary: true,
-        expiresAt: expiresAt.toISOString(),
-        upvotes: 0,
-        upvotedBy: [],
-        createdAt: now.toISOString(),
-      };
-
-      newGroups.push(newGroup);
-      db.groups.push(newGroup);
-
-      // Mark users as processed
-      memberIds.forEach((id) => processedUsers.add(id));
-    }
-  }
-
-  saveDatabase(db);
-  return newGroups;
+  return [];
 }
 
-// Upvote a group
+// Groups removed - singular model only
 export function upvoteGroup(userId: string, groupId: string): Group | null {
-  const db = getDatabase();
-  const group = db.groups.find((g) => g.id === groupId);
-
-  if (!group) return null;
-
-  // Ensure upvotedBy exists
-  if (!group.upvotedBy) {
-    group.upvotedBy = [];
-  }
-  if (group.upvotes === undefined) {
-    group.upvotes = 0;
-  }
-
-  // Check if user already upvoted
-  if (group.upvotedBy.includes(userId)) {
-    // Remove upvote
-    group.upvotedBy = group.upvotedBy.filter((id) => id !== userId);
-    group.upvotes = Math.max(0, group.upvotes - 1);
-  } else {
-    // Add upvote
-    group.upvotedBy.push(userId);
-    group.upvotes += 1;
-  }
-
-  // Convert to permanent if upvoted by >= 70% of members
-  const upvoteThreshold = Math.ceil(group.memberIds.length * 0.7);
-  if (group.isTemporary && group.upvotes >= upvoteThreshold) {
-    group.isTemporary = false;
-    group.expiresAt = undefined;
-  }
-
-  saveDatabase(db);
-  return group;
+  return null;
 }
 
-// Get active temporary groups (not expired)
 export function getActiveTemporaryGroups(): Group[] {
-  const db = getDatabase();
-  const now = new Date();
-
-  return db.groups.filter(
-    (g) => g.isTemporary && g.expiresAt && new Date(g.expiresAt) > now
-  );
+  return [];
 }
 
-// Clean up expired temporary groups
 export function cleanupExpiredGroups(): number {
-  const db = getDatabase();
-  const now = new Date();
-  const beforeCount = db.groups.length;
-
-  db.groups = db.groups.filter(
-    (g) => !g.isTemporary || (g.expiresAt && new Date(g.expiresAt) > now)
-  );
-
-  const removed = beforeCount - db.groups.length;
-  if (removed > 0) {
-    saveDatabase(db);
-  }
-
-  return removed;
+  return 0;
 }
 
 // ============ SCRAPING SIMULATION ============

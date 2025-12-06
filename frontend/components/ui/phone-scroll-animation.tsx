@@ -18,6 +18,14 @@ const messages: Message[] = [
     isUser: true,
   },
   {
+    text: '🤖 Personal Assistant schedules meetings',
+    isUser: false,
+  },
+  {
+    text: '📅 Auto-add calendar invites & reminders',
+    isUser: true,
+  },
+  {
     text: '🔄 Real-time Sync across devices',
     isUser: false,
   },

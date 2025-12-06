@@ -117,11 +117,41 @@ function IPhoneWithMessages({ scrollProgress }: { scrollProgress: number }) {
     }
   }, [showMessages, currentCycle]);
 
-  const messages = [
-    { text: 'I need a team for volleyball 🏐', isUser: true, delay: 0 },
-    { text: 'Here is a volleyball group!', isUser: false, delay: 0.4 },
-    { type: 'profile', delay: 0.8 },
+  // Alternate between grouping and scheduling messages
+  const messageCycles = [
+    // Cycle 1: Group creation
+    [
+      { text: 'I need a team for volleyball 🏐', isUser: true, delay: 0 },
+      { text: 'Here is a volleyball group!', isUser: false, delay: 0.4 },
+      { type: 'profile', delay: 0.8 },
+    ],
+    // Cycle 2: Scheduling
+    [
+      { text: 'Schedule a doctor visit at 5pm', isUser: true, delay: 0 },
+      {
+        text: '✅ Scheduled! Added to your calendar',
+        isUser: false,
+        delay: 0.4,
+      },
+      { type: 'calendar', delay: 0.8 },
+    ],
+    // Cycle 3: Meeting setup
+    [
+      {
+        text: 'Set up a meeting with the team tomorrow',
+        isUser: true,
+        delay: 0,
+      },
+      {
+        text: '📅 Meeting created! Invites sent to 5 people',
+        isUser: false,
+        delay: 0.4,
+      },
+      { type: 'meeting', delay: 0.8 },
+    ],
   ];
+
+  const messages = messageCycles[currentCycle % messageCycles.length];
 
   return (
     <div
@@ -354,7 +384,9 @@ function IPhoneWithMessages({ scrollProgress }: { scrollProgress: number }) {
                       <div key={currentCycle} className="flex flex-col gap-1">
                         {messages.map((message, index) => (
                           <motion.div
-                            key={index}
+                            key={`${currentCycle}-${
+                              message.type || message.text
+                            }-${index}`}
                             initial={{ opacity: 0, y: 15 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0 }}
@@ -413,6 +445,68 @@ function IPhoneWithMessages({ scrollProgress }: { scrollProgress: number }) {
                                       <span className="text-white text-[10px] font-semibold">
                                         Join
                                       </span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {message.type === 'calendar' && (
+                              <div
+                                className="flex justify-start"
+                                style={{ paddingLeft: '4px', marginTop: '4px' }}
+                              >
+                                <div className="rounded-xl overflow-hidden bg-white border border-gray-200 shadow-sm">
+                                  <div className="p-2.5">
+                                    <div className="flex items-center gap-2 mb-1.5">
+                                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center">
+                                        <span className="text-white text-sm">
+                                          📅
+                                        </span>
+                                      </div>
+                                      <div className="flex-1">
+                                        <p className="font-semibold text-[12px] text-gray-900">
+                                          Doctor Visit
+                                        </p>
+                                        <p className="text-[10px] text-gray-500">
+                                          Today at 5:00 PM
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-1 text-[10px] text-gray-600">
+                                      <span>📍</span>
+                                      <span>Medical Center</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {message.type === 'meeting' && (
+                              <div
+                                className="flex justify-start"
+                                style={{ paddingLeft: '4px', marginTop: '4px' }}
+                              >
+                                <div className="rounded-xl overflow-hidden bg-white border border-gray-200 shadow-sm">
+                                  <div className="p-2.5">
+                                    <div className="flex items-center gap-2 mb-1.5">
+                                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-indigo-500 flex items-center justify-center">
+                                        <span className="text-white text-sm">
+                                          👥
+                                        </span>
+                                      </div>
+                                      <div className="flex-1">
+                                        <p className="font-semibold text-[12px] text-gray-900">
+                                          Team Meeting
+                                        </p>
+                                        <p className="text-[10px] text-gray-500">
+                                          Tomorrow at 2:00 PM
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-1 text-[10px] text-gray-600">
+                                      <span>👤</span>
+                                      <span>5 people invited</span>
                                     </div>
                                   </div>
                                 </div>
@@ -513,7 +607,16 @@ export default function HeroSection() {
   }, [scrollYProgress]);
 
   const titles = useMemo(
-    () => ['groups', 'communities', 'connections', 'teams', 'syncs'],
+    () => [
+      'groups',
+      'communities',
+      'connections',
+      'teams',
+      'syncs',
+      'schedules',
+      'meetings',
+      'assistants',
+    ],
     []
   );
 
@@ -592,8 +695,8 @@ export default function HeroSection() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.4, ease: 'easeOut' }}
               >
-                Find your squad, join communities, and sync with people who
-                share your interests.
+                Find your squad, join communities, and let your personal
+                assistant handle scheduling and meetings for you.
               </motion.p>
 
               <motion.div
